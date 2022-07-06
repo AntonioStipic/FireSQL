@@ -17,9 +17,9 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
       - run: sudo apt-get install g++ -y
       - run: sudo apt-get install -y build-essential python -y
-      - run: npm install -g node-gyp
-      - run: npm install -g node-pre-gyp
-      - run: npm install --legacy-peer-deps
+      - run: npm install -g node-gyp --unsafe-perm
+      - run: npm install -g node-pre-gyp --unsafe-perm
+      - run: npm install --legacy-peer-deps --unsafe-perm
       - run: npm run prebuild
       - run: npm run release:prepare
       - run: npm run npm:publish
