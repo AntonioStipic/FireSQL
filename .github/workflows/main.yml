@@ -15,6 +15,8 @@ jobs:
         with:
           node-version: '12'
           registry-url: 'https://npm.pkg.github.com'
+      - run: export CC=/usr/bin/clang
+      - run: export CXX=/usr/bin/clang++
       - run: sudo apt-get install g++ -y
       - run: sudo apt-get install -y build-essential python -y
       - run: npm install -g node-gyp --unsafe-perm
