@@ -78,10 +78,10 @@ export class SelectOperation {
     let queries: firebase.firestore.Query[] = [];
 
     if (ast.from.group) {
-      assert(
-        this._ref.path === '',
-        'Collection group queries are only allowed from the root of the database.'
-      );
+      // assert(
+      //   this._ref.path === '',
+      //   'Collection group queries are only allowed from the root of the database.'
+      // );
 
       const firestore = contains(this._ref, 'firestore')
         ? this._ref.firestore
