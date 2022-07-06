@@ -16,7 +16,7 @@ jobs:
           node-version: '10.18.0'
           registry-url: 'https://npm.pkg.github.com'
       - run: npm install --legacy-peer-deps
-      - run: npm prebuild
+      - run: npm run prebuild
       - run: npm run release:prepare
       - run: npm run npm:publish
         env:
