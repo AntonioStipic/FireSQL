@@ -409,7 +409,7 @@ column =
   }
 
 ident_name
-  =  parts:ident_part+ { return parts.join(''); }
+  =  parts:(ident_part / "-")+ { return parts.join(''); }
 
 ident_start = [A-Za-z_]
 

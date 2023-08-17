@@ -3,7 +3,6 @@ node_modules
 *.log
 .vscode
 .idea
-out/
 release/
 stuff/
 .rpt2_cache
