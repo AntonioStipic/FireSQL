@@ -13,16 +13,16 @@
   "license": "MIT",
   "scripts": {
     "lint": "tslint --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-    "prebuild": "yarn run pegjs && rimraf out",
+    "prebuild": "npm run pegjs && rimraf out",
     "build": "tsc --module commonjs && rollup -c rollup.config.js",
     "start": "rollup -c rollup.config.js -w",
     "test": "ts-node --project tools/tsconfig.json tools/run-tests.ts",
     "test:emulator": "ts-node --project tools/tsconfig.json tools/tests/emulator/index.ts",
     "test:watch": "jest --verbose --watch",
-    "test:prod": "yarn run lint && yarn run test --coverage --no-cache",
+    "test:prod": "npm run lint && npm run test --coverage --no-cache",
     "test:setup": "ts-node --project tools/tsconfig.json tools/tests/test-setup.ts",
     "ts-node": "ts-node",
-    "release:prepare": "yarn run build && ts-node tools/prepare-release.ts",
+    "release:prepare": "npm run build && ts-node tools/prepare-release.ts",
     "npm:publish": "cd release && npm publish",
     "pegjs": "pegjs --extra-options-file pegjs.config.json"
   },
@@ -69,11 +69,15 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "core-js": "^3.0.1"
+    "core-js": "^3.0.1",
+    "node-pre-gyp": "^0.17.0"
   },
   "peerDependencies": {
     "firebase": "*",
     "rxfire": "*",
     "rxjs": "*"
+  },
+  "resolutions": {
+    "grpc": "^1.12.0"
   }
 }
