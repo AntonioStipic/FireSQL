@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.nameOrAlias = exports.prefixSuccessor = exports.astValueToNative = exports.deepGet = exports.safeGet = exports.contains = exports.assert = exports.DOCUMENT_KEY_NAME = void 0;
 exports.DOCUMENT_KEY_NAME = '__name__';
 function assert(condition, message) {
     if (!condition) {
@@ -77,7 +78,7 @@ function nameOrAlias(name, alias, aggrFn) {
     if (!aggrFn) {
         return name;
     }
-    return aggrFn.name + "(" + name + ")";
+    return "".concat(aggrFn.name, "(").concat(name, ")");
 }
 exports.nameOrAlias = nameOrAlias;
 //# sourceMappingURL=utils.js.map

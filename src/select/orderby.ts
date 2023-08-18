@@ -1,4 +1,5 @@
 import { assert } from '../utils';
+import firebase from 'firebase/app';
 
 export function applyOrderBy(
   queries: firebase.firestore.Query[],

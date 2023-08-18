@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -46,6 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FireSQL = void 0;
 require("firebase/firestore");
 var sql_parser_1 = require("./sql-parser");
 var utils_1 = require("./utils");
@@ -84,21 +86,21 @@ var FireSQL = /** @class */ (function () {
         get: function () {
             return this._ref;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(FireSQL.prototype, "firestore", {
         get: function () {
             return this._ref.firestore;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(FireSQL.prototype, "options", {
         get: function () {
             return this._options;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     FireSQL.prototype.query = function (sql, options) {
@@ -106,15 +108,15 @@ var FireSQL = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var ast;
             return __generator(this, function (_a) {
-                utils_1.assert(
+                (0, utils_1.assert)(
                 // tslint:disable-next-line: strict-type-predicates
                 typeof sql === 'string' && sql.length > 0, 'query() expects a non-empty string.');
-                ast = sql_parser_1.parse(sql);
+                ast = (0, sql_parser_1.parse)(sql);
                 if (ast.type === 'select') {
-                    return [2 /*return*/, select_1.select_(this._ref, ast, __assign({}, this._options, options))];
+                    return [2 /*return*/, (0, select_1.select_)(this._ref, ast, __assign(__assign({}, this._options), options))];
                 }
                 else {
-                    throw new Error("\"" + ast.type.toUpperCase() + "\" statements are not supported.");
+                    throw new Error("\"".concat(ast.type.toUpperCase(), "\" statements are not supported."));
                 }
                 return [2 /*return*/];
             });

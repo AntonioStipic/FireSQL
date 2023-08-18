@@ -1,6 +1,7 @@
 import { QueryOptions } from '../shared';
 import { SQL_Select } from '../sql-parser';
 import { DocumentData } from '../utils';
+import firebase from 'firebase/app';
 export declare function select_(ref: firebase.firestore.DocumentReference, ast: SQL_Select, options: QueryOptions): Promise<DocumentData[]>;
 export declare class SelectOperation {
     private _ref;

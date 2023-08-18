@@ -19,18 +19,18 @@ var firesql_1 = require("../firesql");
 var select_1 = require("../select");
 var utils_1 = require("../utils");
 firesql_1.FireSQL.prototype.rxQuery = function (sql, options) {
-    utils_1.assert(
+    (0, utils_1.assert)(
     // tslint:disable-next-line: strict-type-predicates
     typeof sql === 'string' && sql.length > 0, 'rxQuery() expects a non-empty string.');
-    var ast = sql_parser_1.parse(sql);
-    utils_1.assert(ast.type === 'select', 'Only SELECT statements are supported.');
-    return rxSelect(this._ref, ast, __assign({}, this._options, options));
+    var ast = (0, sql_parser_1.parse)(sql);
+    (0, utils_1.assert)(ast.type === 'select', 'Only SELECT statements are supported.');
+    return rxSelect(this._ref, ast, __assign(__assign({}, this._options), options));
 };
 function rxSelect(ref, ast, options) {
     var selectOp = new select_1.SelectOperation(ref, ast, options);
     var queries = selectOp.generateQueries_();
     if (ast._next) {
-        utils_1.assert(ast._next.type === 'select', ' UNION statements are only supported between SELECTs.');
+        (0, utils_1.assert)(ast._next.type === 'select', ' UNION statements are only supported between SELECTs.');
         // This is the UNION of 2 SELECTs, so lets process the second
         // one and merge their queries
         queries = queries.concat(selectOp.generateQueries_(ast._next));
@@ -51,10 +51,10 @@ function rxSelect(ref, ast, options) {
         idField = utils_1.DOCUMENT_KEY_NAME;
         keepIdField = false;
     }
-    var rxData = rxjs_1.combineLatest(queries.map(function (query) {
-        return firestore_1.collectionData(query, idField);
+    var rxData = (0, rxjs_1.combineLatest)(queries.map(function (query) {
+        return (0, firestore_1.collectionData)(query, idField);
     }));
-    return rxData.pipe(operators_1.map(function (results) {
+    return rxData.pipe((0, operators_1.map)(function (results) {
         // We have an array of results (one for each query we generated) where
         // each element is an array of documents. We need to flatten them.
         var documents = [];
@@ -66,7 +66,7 @@ function rxSelect(ref, ast, options) {
                 // Note: for now we're only allowing to query a single collection, but
                 // if at any point we change that (for example with JOINs) we'll need to
                 // use the full document path here instead of just its ID
-                if (!utils_1.contains(seenDocuments, doc[idField])) {
+                if (!(0, utils_1.contains)(seenDocuments, doc[idField])) {
                     seenDocuments[doc[idField]] = true;
                     if (!keepIdField) {
                         delete doc[idField];
@@ -76,7 +76,7 @@ function rxSelect(ref, ast, options) {
             }
         }
         return documents;
-    }), operators_1.map(function (documents) {
+    }), (0, operators_1.map)(function (documents) {
         return selectOp.processDocuments_(queries, documents);
     }));
 }

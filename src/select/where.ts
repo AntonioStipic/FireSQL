@@ -1,5 +1,6 @@
 import { SQL_Value, SQL_ValueString, SQL_ValueBool } from '../sql-parser';
 import { assert, prefixSuccessor, astValueToNative } from '../utils';
+import firebase from 'firebase/app';
 
 export function applyWhere(
   queries: firebase.firestore.Query[],

@@ -23,6 +23,7 @@ import {
 import { applyOrderBy, applyOrderByLocally } from './orderby';
 import { applyLimit, applyLimitLocally } from './limit';
 import { applyWhere } from './where';
+import firebase from 'firebase/app';
 
 const VALID_AGGR_FUNCTIONS = ['MIN', 'MAX', 'SUM', 'AVG'];
 
@@ -99,7 +100,7 @@ export class SelectOperation {
     /*
      * We'd need this if we end up implementing JOINs, but for now
      * it's unnecessary since we're only querying a single collection
-    
+
       // Keep track of aliased "tables" (collections)
       const aliasedCollections: { [k: string]: string } = {};
       if (ast.from[0].as.length > 0) {
@@ -122,7 +123,7 @@ export class SelectOperation {
           FROM restaurants
           WHERE city IN ('Nashvile', 'Denver')
           ORDER BY city, name
-  
+
        It happens because "WHERE ... IN ..." splits into 2 separate
        queries with a "==" filter, and an order by clause cannot
        contain a field with an equality filter:

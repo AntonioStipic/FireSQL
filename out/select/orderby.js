@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.applyOrderByLocally = exports.applyOrderBy = void 0;
 var utils_1 = require("../utils");
 function applyOrderBy(queries, astOrderBy) {
     astOrderBy.forEach(function (orderBy) {
-        utils_1.assert(orderBy.expr.type === 'column_ref', 'ORDER BY only supports ordering by field names.');
+        (0, utils_1.assert)(orderBy.expr.type === 'column_ref', 'ORDER BY only supports ordering by field names.');
         queries = queries.map(function (query) {
             return query.orderBy(orderBy.expr.column, orderBy.type.toLowerCase());
         });

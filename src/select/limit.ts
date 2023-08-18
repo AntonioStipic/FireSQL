@@ -1,5 +1,6 @@
 import { assert, astValueToNative } from '../utils';
 import { SQL_Value } from '../sql-parser';
+import firebase from 'firebase/app';
 
 export function applyLimit(
   queries: firebase.firestore.Query[],

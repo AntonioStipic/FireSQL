@@ -1,9 +1,10 @@
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -35,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SelectOperation = exports.select_ = void 0;
 var utils_1 = require("../utils");
 var groupby_1 = require("./groupby");
 var orderby_1 = require("./orderby");
@@ -81,15 +83,18 @@ var SelectOperation = /** @class */ (function () {
     }
     SelectOperation.prototype.generateQueries_ = function (ast) {
         ast = ast || this._ast;
-        utils_1.assert(ast.from.parts.length % 2 === 1, '"FROM" needs a path to a collection (odd number of parts).');
+        (0, utils_1.assert)(ast.from.parts.length % 2 === 1, '"FROM" needs a path to a collection (odd number of parts).');
         var path = ast.from.parts.join('/');
         var queries = [];
         if (ast.from.group) {
-            utils_1.assert(this._ref.path === '', 'Collection group queries are only allowed from the root of the database.');
-            var firestore = utils_1.contains(this._ref, 'firestore')
+            // assert(
+            //   this._ref.path === '',
+            //   'Collection group queries are only allowed from the root of the database.'
+            // );
+            var firestore = (0, utils_1.contains)(this._ref, 'firestore')
                 ? this._ref.firestore
                 : this._ref;
-            utils_1.assert(typeof firestore.collectionGroup === 'function', "Your version of the Firebase SDK doesn't support collection group queries.");
+            (0, utils_1.assert)(typeof firestore.collectionGroup === 'function', "Your version of the Firebase SDK doesn't support collection group queries.");
             queries.push(firestore.collectionGroup(path));
         }
         else {
@@ -98,7 +103,7 @@ var SelectOperation = /** @class */ (function () {
         /*
          * We'd need this if we end up implementing JOINs, but for now
          * it's unnecessary since we're only querying a single collection
-        
+    
           // Keep track of aliased "tables" (collections)
           const aliasedCollections: { [k: string]: string } = {};
           if (ast.from[0].as.length > 0) {
@@ -108,17 +113,17 @@ var SelectOperation = /** @class */ (function () {
           }
        */
         if (ast.where) {
-            queries = where_1.applyWhere(queries, ast.where);
+            queries = (0, where_1.applyWhere)(queries, ast.where);
         }
         if (ast.orderby) {
-            queries = orderby_1.applyOrderBy(queries, ast.orderby);
+            queries = (0, orderby_1.applyOrderBy)(queries, ast.orderby);
             /*
              FIXME: the following query throws an error:
                 SELECT city, name
                 FROM restaurants
                 WHERE city IN ('Nashvile', 'Denver')
                 ORDER BY city, name
-        
+      
              It happens because "WHERE ... IN ..." splits into 2 separate
              queries with a "==" filter, and an order by clause cannot
              contain a field with an equality filter:
@@ -132,10 +137,10 @@ var SelectOperation = /** @class */ (function () {
             // First we apply the limit to each query we may have
             // and later we'll apply it again locally to the
             // merged set of documents, in case we end up with too many.
-            queries = limit_1.applyLimit(queries, ast.limit);
+            queries = (0, limit_1.applyLimit)(queries, ast.limit);
         }
         if (ast._next) {
-            utils_1.assert(ast._next.type === 'select', ' UNION statements are only supported between SELECTs.');
+            (0, utils_1.assert)(ast._next.type === 'select', ' UNION statements are only supported between SELECTs.');
             // This is the UNION of 2 SELECTs, so lets process the second
             // one and merge their queries
             queries = queries.concat(this.generateQueries_(ast._next));
@@ -167,7 +172,7 @@ var SelectOperation = /** @class */ (function () {
                                             for (i = 0; i < numDocs; i++) {
                                                 docSnap = snapshot.docs[i];
                                                 docPath = docSnap.ref.path;
-                                                if (!utils_1.contains(seenDocuments, docPath)) {
+                                                if (!(0, utils_1.contains)(seenDocuments, docPath)) {
                                                     docData = docSnap.data();
                                                     if (this._includeId) {
                                                         docData[typeof this._includeId === 'string'
@@ -200,7 +205,7 @@ var SelectOperation = /** @class */ (function () {
         }
         else {
             if (this._ast.groupby) {
-                var groupedDocs = groupby_1.applyGroupByLocally(documents, this._ast.groupby);
+                var groupedDocs = (0, groupby_1.applyGroupByLocally)(documents, this._ast.groupby);
                 return this._processGroupedDocs(queries, groupedDocs);
             }
             else {
@@ -213,12 +218,12 @@ var SelectOperation = /** @class */ (function () {
         if (this._ast.orderby && queries.length > 1) {
             // We merged more than one query into a single set of documents
             // so we need to order the documents again, this time client-side.
-            documents = orderby_1.applyOrderByLocally(documents, this._ast.orderby);
+            documents = (0, orderby_1.applyOrderByLocally)(documents, this._ast.orderby);
         }
         if (this._ast.limit && queries.length > 1) {
             // We merged more than one query into a single set of documents
             // so we need to apply the limit again, this time client-side.
-            documents = limit_1.applyLimitLocally(documents, this._ast.limit);
+            documents = (0, limit_1.applyLimitLocally)(documents, this._ast.limit);
         }
         if (typeof this._ast.columns === 'string' && this._ast.columns === '*') {
             // Return all fields from the documents
@@ -248,7 +253,7 @@ var SelectOperation = /** @class */ (function () {
     };
     SelectOperation.prototype._processGroupedDocs = function (queries, groupedDocs) {
         var _this = this;
-        utils_1.assert(this._ast.columns !== '*', 'Cannot "SELECT *" when using GROUP BY.');
+        (0, utils_1.assert)(this._ast.columns !== '*', 'Cannot "SELECT *" when using GROUP BY.');
         var aggrColumns = getAggrColumns(this._ast.columns);
         var groups = flattenGroupedDocs(groupedDocs);
         if (aggrColumns.length === 0) {
@@ -263,9 +268,9 @@ var SelectOperation = /** @class */ (function () {
         else {
             var results_1 = [];
             // TODO: ORDER BY
-            utils_1.assert(!this._ast.orderby, 'ORDER BY is not yet supported when using GROUP BY.');
+            (0, utils_1.assert)(!this._ast.orderby, 'ORDER BY is not yet supported when using GROUP BY.');
             // TODO: LIMIT
-            utils_1.assert(!this._ast.limit, 'LIMIT is not yet supported when using GROUP BY.');
+            (0, utils_1.assert)(!this._ast.limit, 'LIMIT is not yet supported when using GROUP BY.');
             Object.keys(groups).forEach(function (groupKey) {
                 var docsGroup = groups[groupKey];
                 aggregateDocuments(docsGroup, aggrColumns);
@@ -285,8 +290,8 @@ var SelectOperation = /** @class */ (function () {
             switch (column.expr.type) {
                 case 'column_ref':
                     fieldName = column.expr.column;
-                    fieldAlias = utils_1.nameOrAlias(fieldName, column.as);
-                    entries.push(new AliasedField(fieldName, fieldAlias, utils_1.deepGet(document, fieldName)));
+                    fieldAlias = (0, utils_1.nameOrAlias)(fieldName, column.as);
+                    entries.push(new AliasedField(fieldName, fieldAlias, (0, utils_1.deepGet)(document, fieldName)));
                     if (fieldName === utils_1.DOCUMENT_KEY_NAME) {
                         idIncluded = true;
                     }
@@ -294,7 +299,7 @@ var SelectOperation = /** @class */ (function () {
                 case 'aggr_func':
                     vaidateAggrFunction(column.expr);
                     fieldName = column.expr.field;
-                    fieldAlias = utils_1.nameOrAlias(fieldName, column.as, column.expr);
+                    fieldAlias = (0, utils_1.nameOrAlias)(fieldName, column.as, column.expr);
                     entries.push(new AliasedField(fieldName, fieldAlias, aggregate[column.expr.name.toLowerCase()][fieldName]));
                     break;
                 default:
@@ -305,7 +310,7 @@ var SelectOperation = /** @class */ (function () {
         if (this._includeId && !idIncluded) {
             resultFields.push(new AliasedField(utils_1.DOCUMENT_KEY_NAME, typeof this._includeId === 'string'
                 ? this._includeId
-                : utils_1.DOCUMENT_KEY_NAME, utils_1.safeGet(document, utils_1.DOCUMENT_KEY_NAME)));
+                : utils_1.DOCUMENT_KEY_NAME, (0, utils_1.safeGet)(document, utils_1.DOCUMENT_KEY_NAME)));
         }
         if (asFieldArray) {
             return resultFields;
@@ -329,7 +334,7 @@ function aggregateDocuments(docsGroup, functions) {
         // we don't want to sum its value more than once.
         var skipSum = {};
         functions.forEach(function (fn) {
-            var value = utils_1.safeGet(doc, fn.field);
+            var value = (0, utils_1.safeGet)(doc, fn.field);
             var isNumber = !Number.isNaN(value);
             switch (fn.name) {
                 case 'AVG':
@@ -337,28 +342,28 @@ function aggregateDocuments(docsGroup, functions) {
                     docsGroup.aggr.avg[fn.field] = 0;
                 // tslint:disable-next-line:no-switch-case-fall-through
                 case 'SUM':
-                    if (utils_1.safeGet(skipSum, fn.field) !== true) {
+                    if ((0, utils_1.safeGet)(skipSum, fn.field) !== true) {
                         skipSum[fn.field] = true;
-                        if (!utils_1.contains(docsGroup.aggr.total, fn.field)) {
+                        if (!(0, utils_1.contains)(docsGroup.aggr.total, fn.field)) {
                             docsGroup.aggr.total[fn.field] = 0;
                             docsGroup.aggr.sum[fn.field] = 0;
                         }
                         value = Number(value);
-                        utils_1.assert(!Number.isNaN(value), "Can't compute aggregate function " + fn.name + "(" + fn.field + ") because some values are not numbers.");
+                        (0, utils_1.assert)(!Number.isNaN(value), "Can't compute aggregate function ".concat(fn.name, "(").concat(fn.field, ") because some values are not numbers."));
                         docsGroup.aggr.total[fn.field] += 1;
                         docsGroup.aggr.sum[fn.field] += value;
                         // FIXME: if the numbers are big we could easily go out of bounds in this sum
                     }
                     break;
                 case 'MIN':
-                    utils_1.assert(isNumber || typeof value === 'string', "Aggregate function MIN(" + fn.field + ") can only be performed on numbers or strings");
-                    if (!utils_1.contains(docsGroup.aggr.min, fn.field)) {
+                    (0, utils_1.assert)(isNumber || typeof value === 'string', "Aggregate function MIN(".concat(fn.field, ") can only be performed on numbers or strings"));
+                    if (!(0, utils_1.contains)(docsGroup.aggr.min, fn.field)) {
                         docsGroup.aggr.min[fn.field] = value;
                     }
                     else {
                         if (!Number.isNaN(docsGroup.aggr.min[fn.field])) {
                             // The current minimum is a number
-                            utils_1.assert(isNumber, "Can't compute aggregate function MIN(" + fn.field + ") because some values are not numbers.");
+                            (0, utils_1.assert)(isNumber, "Can't compute aggregate function MIN(".concat(fn.field, ") because some values are not numbers."));
                             value = Number(value);
                         }
                         if (value < docsGroup.aggr.min[fn.field]) {
@@ -367,14 +372,14 @@ function aggregateDocuments(docsGroup, functions) {
                     }
                     break;
                 case 'MAX':
-                    utils_1.assert(isNumber || typeof value === 'string', "Aggregate function MAX(" + fn.field + ") can only be performed on numbers or strings");
-                    if (!utils_1.contains(docsGroup.aggr.max, fn.field)) {
+                    (0, utils_1.assert)(isNumber || typeof value === 'string', "Aggregate function MAX(".concat(fn.field, ") can only be performed on numbers or strings"));
+                    if (!(0, utils_1.contains)(docsGroup.aggr.max, fn.field)) {
                         docsGroup.aggr.max[fn.field] = value;
                     }
                     else {
                         if (!Number.isNaN(docsGroup.aggr.max[fn.field])) {
                             // The current maximum is a number
-                            utils_1.assert(isNumber, "Can't compute aggregate function MAX(" + fn.field + ") because some values are not numbers.");
+                            (0, utils_1.assert)(isNumber, "Can't compute aggregate function MAX(".concat(fn.field, ") because some values are not numbers."));
                             value = Number(value);
                         }
                         if (value > docsGroup.aggr.max[fn.field]) {
@@ -404,7 +409,7 @@ function getAggrColumns(columns) {
                 aggrColumns.push(astColumn.expr);
             }
             else {
-                utils_1.assert(astColumn.expr.type === 'column_ref', 'Only field names and aggregate functions are supported in SELECT statements.');
+                (0, utils_1.assert)(astColumn.expr.type === 'column_ref', 'Only field names and aggregate functions are supported in SELECT statements.');
             }
         });
     }
@@ -412,22 +417,22 @@ function getAggrColumns(columns) {
 }
 function vaidateAggrFunction(aggrFn) {
     // TODO: support COUNT, then remove this assert
-    utils_1.assert(aggrFn.name !== 'COUNT', 'Aggregate function COUNT is not yet supported.');
-    utils_1.assert(VALID_AGGR_FUNCTIONS.includes(aggrFn.name), "Unknown aggregate function '" + aggrFn.name + "'.");
-    utils_1.assert(
+    (0, utils_1.assert)(aggrFn.name !== 'COUNT', 'Aggregate function COUNT is not yet supported.');
+    (0, utils_1.assert)(VALID_AGGR_FUNCTIONS.includes(aggrFn.name), "Unknown aggregate function '".concat(aggrFn.name, "'."));
+    (0, utils_1.assert)(
     // tslint:disable-next-line: strict-type-predicates
-    typeof aggrFn.field === 'string', "Unsupported type in aggregate function '" + aggrFn.name + "'.");
+    typeof aggrFn.field === 'string', "Unsupported type in aggregate function '".concat(aggrFn.name, "'."));
 }
 function flattenGroupedDocs(groupedDocs) {
     var result = {};
     for (var prop in groupedDocs) {
-        if (!utils_1.contains(groupedDocs, prop)) {
+        if (!(0, utils_1.contains)(groupedDocs, prop)) {
             continue;
         }
         if (!(groupedDocs[prop] instanceof groupby_1.DocumentsGroup)) {
             var flatInner = flattenGroupedDocs(groupedDocs[prop]);
             for (var innerProp in flatInner) {
-                if (!utils_1.contains(flatInner, innerProp)) {
+                if (!(0, utils_1.contains)(flatInner, innerProp)) {
                     continue;
                 }
                 result[prop + '$$' + innerProp] = flatInner[innerProp];

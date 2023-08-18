@@ -6,6 +6,7 @@ import { FireSQL } from '../firesql';
 import { SelectOperation } from '../select';
 import { assert, DocumentData, contains, DOCUMENT_KEY_NAME } from '../utils';
 import { QueryOptions } from '../shared';
+import firebase from 'firebase/app';
 
 declare module '../firesql' {
   interface FireSQL {

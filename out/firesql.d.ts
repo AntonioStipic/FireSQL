@@ -6,9 +6,9 @@ export declare class FireSQL {
     private _options;
     private _ref;
     constructor(ref: FirestoreOrDocument, _options?: FireSQLOptions);
-    readonly ref: firebase.firestore.DocumentReference;
-    readonly firestore: firebase.firestore.Firestore;
-    readonly options: FireSQLOptions;
+    get ref(): firebase.firestore.DocumentReference;
+    get firestore(): firebase.firestore.Firestore;
+    get options(): FireSQLOptions;
     query(sql: string, options?: QueryOptions): Promise<DocumentData[]>;
     query<T>(sql: string, options?: QueryOptions): Promise<T[]>;
     toJSON(): object;

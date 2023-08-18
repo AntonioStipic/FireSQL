@@ -1,5 +1,15 @@
 "use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.applyWhere = void 0;
 var utils_1 = require("../utils");
 function applyWhere(queries, astWhere) {
     if (astWhere.type === 'binary_expr') {
@@ -8,11 +18,11 @@ function applyWhere(queries, astWhere) {
             queries = applyWhere(queries, astWhere.right);
         }
         else if (astWhere.operator === 'OR') {
-            queries = applyWhere(queries, astWhere.left).concat(applyWhere(queries, astWhere.right));
+            queries = __spreadArray(__spreadArray([], applyWhere(queries, astWhere.left), true), applyWhere(queries, astWhere.right), true);
         }
         else if (astWhere.operator === 'IN') {
-            utils_1.assert(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
-            utils_1.assert(astWhere.right.type === 'expr_list', 'Unsupported WHERE type on right side.');
+            (0, utils_1.assert)(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
+            (0, utils_1.assert)(astWhere.right.type === 'expr_list', 'Unsupported WHERE type on right side.');
             var newQueries_1 = [];
             astWhere.right.value.forEach(function (valueObj) {
                 newQueries_1.push.apply(newQueries_1, applyCondition(queries, astWhere.left.column, '=', valueObj));
@@ -20,14 +30,14 @@ function applyWhere(queries, astWhere) {
             queries = newQueries_1;
         }
         else if (astWhere.operator === 'LIKE') {
-            utils_1.assert(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
-            utils_1.assert(astWhere.right.type === 'string', 'Only strings are supported with LIKE in WHERE clause.');
+            (0, utils_1.assert)(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
+            (0, utils_1.assert)(astWhere.right.type === 'string', 'Only strings are supported with LIKE in WHERE clause.');
             var whereLike = parseWhereLike(astWhere.right.value);
             if (whereLike.equals !== void 0) {
                 queries = applyCondition(queries, astWhere.left.column, '=', whereLike.equals);
             }
             else if (whereLike.beginsWith !== void 0) {
-                var successorStr = utils_1.prefixSuccessor(whereLike.beginsWith.value);
+                var successorStr = (0, utils_1.prefixSuccessor)(whereLike.beginsWith.value);
                 queries = applyCondition(queries, astWhere.left.column, '>=', whereLike.beginsWith);
                 queries = applyCondition(queries, astWhere.left.column, '<', stringASTWhereValue(successorStr));
             }
@@ -36,19 +46,19 @@ function applyWhere(queries, astWhere) {
             }
         }
         else if (astWhere.operator === 'BETWEEN') {
-            utils_1.assert(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
-            utils_1.assert(astWhere.right.type === 'expr_list' &&
+            (0, utils_1.assert)(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
+            (0, utils_1.assert)(astWhere.right.type === 'expr_list' &&
                 astWhere.right.value.length === 2, 'BETWEEN needs 2 values in WHERE clause.');
             queries = applyCondition(queries, astWhere.left.column, '>=', astWhere.right.value[0]);
             queries = applyCondition(queries, astWhere.left.column, '<=', astWhere.right.value[1]);
         }
         else if (astWhere.operator === 'CONTAINS') {
-            utils_1.assert(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
-            utils_1.assert(['string', 'number', 'bool', 'null'].includes(astWhere.right.type), 'Only strings, numbers, booleans, and null are supported with CONTAINS in WHERE clause.');
+            (0, utils_1.assert)(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
+            (0, utils_1.assert)(['string', 'number', 'bool', 'null'].includes(astWhere.right.type), 'Only strings, numbers, booleans, and null are supported with CONTAINS in WHERE clause.');
             queries = applyCondition(queries, astWhere.left.column, astWhere.operator, astWhere.right);
         }
         else {
-            utils_1.assert(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
+            (0, utils_1.assert)(astWhere.left.type === 'column_ref', 'Unsupported WHERE type on left side.');
             queries = applyCondition(queries, astWhere.left.column, astWhere.operator, astWhere.right);
         }
     }
@@ -99,11 +109,11 @@ function applyCondition(queries, field, astOperator, astValue) {
             // The != operator is not supported in Firestore so we
             // split this query in two, one with the < operator and
             // another one with the > operator.
-            return applyCondition(queries, field, '<', astValue).concat(applyCondition(queries, field, '>', astValue));
+            return __spreadArray(__spreadArray([], applyCondition(queries, field, '<', astValue), true), applyCondition(queries, field, '>', astValue), true);
         }
     }
     else {
-        var value_1 = utils_1.astValueToNative(astValue);
+        var value_1 = (0, utils_1.astValueToNative)(astValue);
         var operator_1 = whereFilterOp(astOperator);
         return queries.map(function (query) { return query.where(field, operator_1, value_1); });
     }
