@@ -3,7 +3,7 @@ node_modules
 *.log
 .vscode
 .idea
-release/
+out/
 stuff/
 .rpt2_cache
 config/test.config.json

@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "Query Cloud Firestore for Firebase using SQL",
   "keywords": [],
-  "main": "out/firesql.js",
+  "main": "release/firesql.umd.js",
   "typings": "out/types/index.d.ts",
   "author": "Josep Sayol <josep.sayol@gmail.com>",
   "repository": {
